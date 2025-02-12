@@ -66,12 +66,13 @@ router.get('/getUserById', async (req, res) => {
     res.status(500).json({ error: error.message });
   }
 });
-
-router.post('user/:username', async(req, res) => {
+/*
+router.post('/user/:username', async(req, res) => {
 try{
 
   } catch (error) {
     res.status(500).json({ error: error.message });
   }
 });
+*/
 module.exports = router;
