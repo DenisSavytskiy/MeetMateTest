@@ -1,0 +1,79 @@
+<!DOCTYPE html>
+<html lang="uk">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>API Користувача</title>
+    <link rel="stylesheet" href="/css/main.css">
+    <style>
+        body { font-family: Arial, sans-serif; text-align: center; margin: 20px; }
+        input, button { margin: 10px; padding: 10px; display: block; width: 80%; max-width: 300px; }
+        .container { width: 100%; max-width: 400px; margin: auto; }
+    </style>
+</head>
+<body>
+    <span>MyAPI</span>
+    <div class="container">
+        <h2>Реєстрація</h2>
+        <input type="text" id="signupUsername" placeholder="Ім'я користувача">
+        <input type="email" id="signupEmail" placeholder="Email">
+        <input type="password" id="signupPassword" placeholder="Пароль">
+        <button onclick="signup()">Зареєструватися</button>
+        
+        <h2>Логін</h2>
+        <input type="email" id="loginEmail" placeholder="Email">
+        <input type="password" id="loginPassword" placeholder="Пароль">
+        <button onclick="login()">Увійти</button>
+        
+        <h2>Отримати користувача</h2>
+        <input type="text" id="shortId" placeholder="Short ID">
+        <button onclick="getUser()">Отримати дані</button>
+        <p id="userInfo"></p>
+    </div>
+    
+    <script>
+        async function signup() {
+            const username = document.getElementById('signupUsername').value;
+            const email = document.getElementById('signupEmail').value;
+            const password = document.getElementById('signupPassword').value;
+            const res = await fetch('/api/auth/signup', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ username, email, password })
+            });
+            const data = await res.json();
+            alert(data.token ? `Реєстрація успішна. Ваш shortId: ${data.shortId}` : data.error);
+        }
+
+        async function login() {
+            const email = document.getElementById('loginEmail').value;
+            const password = document.getElementById('loginPassword').value;
+            const res = await fetch('/api/auth/login', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ email, password })
+            });
+            const data = await res.json();
+            if (data.token) {
+                localStorage.setItem('token', data.token);
+                alert(`Вхід успішний. Ваш shortId: ${data.shortId}`);
+            } else {
+                alert(data.error);
+            }
+        }
+
+        async function getUser() {
+            const shortId = document.getElementById('shortId').value;
+            const token = localStorage.getItem('token');
+            if (!token) return alert('Будь ласка, увійдіть спочатку.');
+            
+            const res = await fetch(`/api/auth/getUserById?shortId=${shortId}`, {
+                method: 'GET',
+                headers: { 'x-access-token': token }
+            });
+            const data = await res.json();
+            document.getElementById('userInfo').innerText = data.username ? `Користувач: ${data.username}` : data.error;
+        }
+    </script>
+</body>
+</html>
