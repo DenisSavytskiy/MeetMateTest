@@ -14,4 +14,5 @@ app.use(express.json());
 app.use('/api/auth', authRoutes);
 
 const PORT = process.env.PORT || 12424;
-app.listen(PORT, 'localhost', () => console.log(`Сервер запущено: http://localhost:${PORT}/API.html`));
+const HOST = '0.0.0.0'
+app.listen(PORT, HOST, () => console.log(`Сервер запущено: http://${HOST}:${PORT}/API.html`));
