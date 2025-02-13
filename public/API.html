@@ -1,3 +1,4 @@
+<!--API.html-->
 <!DOCTYPE html>
 <html lang="uk">
 <head>
@@ -16,12 +17,12 @@
         <button onclick="signup()">Зареєструватися</button>
     
         <h2>Логін</h2>
-        <input type="email" id="loginEmail" placeholder="Email">
+        <input type="text" id="loginIdentifier" placeholder="Email або Ім'я користувача">
         <input type="password" id="loginPassword" placeholder="Пароль">
         <button onclick="login()">Увійти</button>
         
         <h2>Отримати користувача</h2>
-        <input type="text" id="shortId" placeholder="Short ID">
+        <input type="text" id="shortId" placeholder="ID користувача">
         <button onclick="getUser()">Отримати дані</button>
         <p id="userInfo"></p>
     </div>
@@ -37,21 +38,21 @@
                 body: JSON.stringify({ username, email, password })
             });
             const data = await res.json();
-            alert(data.token ? `Реєстрація успішна. Ваш shortId: ${data.shortId}` : data.error);
+            alert(data.token ? `Реєстрація успішна. Ваш ID користувача: ${data.shortId}` : data.error);
         }
 
         async function login() {
-            const email = document.getElementById('loginEmail').value;
+            const identifier = document.getElementById('loginIdentifier').value;
             const password = document.getElementById('loginPassword').value;
             const res = await fetch('/auth/login', {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify({ email, password })
+                body: JSON.stringify({ identifier, password })
             });
             const data = await res.json();
             if (data.token) {
                 localStorage.setItem('token', data.token);
-                alert(`Вхід успішний. Ваш shortId: ${data.shortId}`);
+                alert(`Вхід успішний. Ваш ID користувача: ${data.shortId}`);
             } else {
                 alert(data.error);
             }

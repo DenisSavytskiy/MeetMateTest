@@ -1,3 +1,4 @@
+//auth.js
 require('dotenv').config();
 const express = require('express');
 const bcryptjs = require('bcryptjs');
@@ -10,11 +11,11 @@ router.post('/signup', async (req, res) => {
   try {
     const existingEmail = await User.findOne({ email });
     if (existingEmail) {
-      return res.status(400).json({ error: 'User with this email already exists' });
+      return res.status(400).json({ error: 'Користувач із цією електронною адресою вже існує' });
     }
     const existingUsername = await User.findOne({ username });
     if (existingUsername) {
-      return res.status(400).json({ error: 'User with this username already exists' });
+      return res.status(400).json({ error: 'Користувач із таким іменем вже існує' });
     }
 
     const hashedPassword = await bcryptjs.hash(password, 10);
@@ -29,20 +30,17 @@ router.post('/signup', async (req, res) => {
 });
 
 router.post('/login', async (req, res) => {
-  const { email, password } = req.body;
+  const { identifier, password } = req.body;
   try {
-    const user = await User.findOne({ email });
-    if (!user) {
-      return res.status(400).json({ error: 'Invalid email or password' });
-    }
+    const userByEmail = await User.findOne({ email: identifier });
+    const userByUsername = await User.findOne({ username: identifier });
 
-    const isMatch = await bcryptjs.compare(password, user.password);
-    if (!isMatch) {
-      return res.status(400).json({ error: 'Invalid email or password' });
+    if (!(userByEmail || userByUsername)) {
+      return res.status(400).json({ error: 'Недійсне ім’я користувача/email або пароль' });
     }
-
     const token = jwt.sign({ userId: user._id }, process.env.JWT_SECRET, { expiresIn: '1h' });
     res.json({ token, shortId: user.shortId });
+
   } catch (error) {
     res.status(500).json({ error: error.message });
   }
@@ -61,7 +59,7 @@ router.get('/getUserById', async (req, res) => {
     const user = await User.findOne({ shortId });
 
     if (!user) {
-      return res.status(404).json({ error: 'User not found' });
+      return res.status(404).json({ error: 'Користувача не знайдено' });
     }
 
     res.json({ username: user.username });
