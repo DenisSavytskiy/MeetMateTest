@@ -3,23 +3,18 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>API Користувача</title>
+    <title>API</title>
     <link rel="stylesheet" href="/css/main.css">
-    <style>
-        body { font-family: Arial, sans-serif; text-align: center; margin: 20px; }
-        input, button { margin: 10px; padding: 10px; display: block; width: 80%; max-width: 300px; }
-        .container { width: 100%; max-width: 400px; margin: auto; }
-    </style>
 </head>
 <body>
-    <span>MyAPI</span>
+    <span>API</span>
     <div class="container">
         <h2>Реєстрація</h2>
         <input type="text" id="signupUsername" placeholder="Ім'я користувача">
         <input type="email" id="signupEmail" placeholder="Email">
         <input type="password" id="signupPassword" placeholder="Пароль">
         <button onclick="signup()">Зареєструватися</button>
-        
+    
         <h2>Логін</h2>
         <input type="email" id="loginEmail" placeholder="Email">
         <input type="password" id="loginPassword" placeholder="Пароль">
@@ -36,7 +31,7 @@
             const username = document.getElementById('signupUsername').value;
             const email = document.getElementById('signupEmail').value;
             const password = document.getElementById('signupPassword').value;
-            const res = await fetch('/api/auth/signup', {
+            const res = await fetch('/auth/signup', {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify({ username, email, password })
@@ -48,7 +43,7 @@
         async function login() {
             const email = document.getElementById('loginEmail').value;
             const password = document.getElementById('loginPassword').value;
-            const res = await fetch('/api/auth/login', {
+            const res = await fetch('/auth/login', {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify({ email, password })
@@ -67,7 +62,7 @@
             const token = localStorage.getItem('token');
             if (!token) return alert('Будь ласка, увійдіть спочатку.');
             
-            const res = await fetch(`/api/auth/getUserById?shortId=${shortId}`, {
+            const res = await fetch(`/auth/getUserById?shortId=${shortId}`, {
                 method: 'GET',
                 headers: { 'x-access-token': token }
             });
