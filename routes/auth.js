@@ -34,8 +34,7 @@ router.post('/login', async (req, res) => {
   try {
     const userByEmail = await User.findOne({ email: identifier });
     const userByUsername = await User.findOne({ username: identifier });
-    const user = userByEmail || userByUsername
-    if (!user) {
+    if (!(userByEmail || userByUsername)) {
       return res.status(400).json({ error: 'Недійсне ім’я користувача/email або пароль' });
     }
     const token = jwt.sign({ userId: user._id }, process.env.JWT_SECRET, { expiresIn: '1h' });
