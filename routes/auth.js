@@ -68,7 +68,6 @@ router.get('/getUserById', async (req, res) => {
   }
 });
 
-const upload = require('../middleware/upload');
 
 router.post('/upload-avatar', upload.single('avatar'), async (req, res) => {
   try {
