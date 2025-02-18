@@ -5,7 +5,6 @@ const connectDB = require('./config/db');
 const authRoutes = require('./routes/auth');
 const path = require('path');
 const exp = require('constants');
-
 const app = express();
 
 connectDB();
@@ -13,6 +12,7 @@ connectDB();
 //app.use(express.static(path.join(__dirname, 'public')));
 app.use(express.json());
 app.use('/auth', authRoutes);
+app.use('/uploads', express.static('uploads'));
 /*
 app.get('/', (req, res) => {
     res.sendFile(path.join(__dirname, 'public', 'API.html'));

@@ -5,6 +5,7 @@ const bcryptjs = require('bcryptjs');
 const jwt = require('jsonwebtoken');
 const User = require('../models/User');
 const router = express.Router();
+const upload = require('../middleware/upload');
 
 router.post('/signup', async (req, res) => {
   const { username, email, password } = req.body;
@@ -66,13 +67,51 @@ router.get('/getUserById', async (req, res) => {
     res.status(500).json({ error: error.message });
   }
 });
-/*
-router.post('/user/:username', async(req, res) => {
-try{
 
+const upload = require('../middleware/upload');
+
+router.post('/upload-avatar', upload.single('avatar'), async (req, res) => {
+  try {
+    if (!req.file) {
+      return res.status(400).json({ error: 'Файл не завантажено' });
+    }
+
+    const token = req.headers['x-access-token'];
+    if (!token) {
+      return res.status(401).json({ error: 'Необхідно авторизуватися' });
+    }
+
+    const decoded = jwt.verify(token, process.env.JWT_SECRET);
+    const user = await User.findById(decoded.userId);
+    if (!user) {
+      return res.status(404).json({ error: 'Користувач не знайдений' });
+    }
+
+    user.avatar = {
+      data: req.file.buffer,
+      contentType: req.file.mimetype
+    };
+    await user.save();
+
+    res.json({ message: 'Аватарка успішно збережена' });
   } catch (error) {
     res.status(500).json({ error: error.message });
   }
 });
-*/
+
+router.get('/avatar/:username', async (req, res) => {
+  try {
+      const user = await User.findOne({ username: req.params.username });
+
+      if (!user || !user.avatar) {
+          return res.status(404).json({ error: 'Аватарка не знайдена' });
+      }
+
+      res.set('Content-Type', user.avatar.contentType);
+      res.send(user.avatar.data);
+  } catch (error) {
+      res.status(500).json({ error: error.message });
+  }
+});
+
 module.exports = router;
