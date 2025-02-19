@@ -35,7 +35,9 @@ router.post('/login', async (req, res) => {
   try {
     const userByEmail = await User.findOne({ email: identifier });
     const userByUsername = await User.findOne({ username: identifier });
-    if (!(userByEmail || userByUsername)) {
+    const user = userByEmail || userByUsername;
+
+    if (!user) {
       return res.status(400).json({ error: 'Недійсне ім’я користувача/email або пароль' });
     }
     const token = jwt.sign({ userId: user._id }, process.env.JWT_SECRET, { expiresIn: '1h' });
@@ -99,7 +101,14 @@ router.post('/upload-avatar', upload.single('avatar'), async (req, res) => {
 });
 
 router.get('/avatar/:username', async (req, res) => {
+  const token = req.headers['x-access-token'];
+
+  if (!token) {
+      return res.status(401).json({ error: 'Токен не надано' });
+  }
+
   try {
+      const decoded = jwt.verify(token, process.env.JWT_SECRET);
       const user = await User.findOne({ username: req.params.username });
 
       if (!user || !user.avatar) {
@@ -109,8 +118,9 @@ router.get('/avatar/:username', async (req, res) => {
       res.set('Content-Type', user.avatar.contentType);
       res.send(user.avatar.data);
   } catch (error) {
-      res.status(500).json({ error: error.message });
+      res.status(500).json({ error: 'Невірний або прострочений токен' });
   }
 });
+
 
 module.exports = router;
