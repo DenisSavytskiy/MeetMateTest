@@ -40,6 +40,12 @@ router.post('/login', async (req, res) => {
     if (!user) {
       return res.status(400).json({ error: 'Недійсне ім’я користувача/email або пароль' });
     }
+
+    const isMatch = await bcryptjs.compare(password, user.password);
+    if (!isMatch) {
+      return res.status(400).json({ error: 'Недійсне ім’я користувача/email або пароль' });
+    }
+
     const token = jwt.sign({ userId: user._id }, process.env.JWT_SECRET, { expiresIn: '1h' });
     res.json({ token, shortId: user.shortId });
 
@@ -47,6 +53,7 @@ router.post('/login', async (req, res) => {
     res.status(500).json({ error: error.message });
   }
 });
+
 
 router.get('/getUserById', async (req, res) => {
   const token = req.headers['x-access-token'];
